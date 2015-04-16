@@ -21,10 +21,10 @@
 #define ARRAY_LENGTH 10
 
 
-void printBin(char x)
+void printBin(uint8_t x)
 {
 	int i = 0;
-	for (i = sizeof(char) * 8 - 1; i >= 0; i--)
+	for (i = sizeof(uint8_t) * 8 - 1; i >= 0; i--)
 	{
 		(x & (1<<i)) ? putchar('1') : putchar('0');
 	}
@@ -32,19 +32,31 @@ void printBin(char x)
 	printf(" ");
 }
 
-void printBinWhole(char* array)
+void printBinWhole(uint8_t* array)
 {
 	int i = 0;
 	for (i = 0; i < ARRAY_LENGTH; ++i)
 	{
 		printBin(array[i]);
 	}
+	printf("\n");
 }
+
+void printHexWhole(uint8_t* array)
+{
+	int i = 0;
+	for (i = 0; i < ARRAY_LENGTH; ++i)
+	{
+		printf("%x ", array[i]);
+	}
+	printf("\n");
+}
+
 
 /**
  * Sets all elements of array to 0
  */
-void zeroArray(char* array)
+void zeroArray(uint8_t* array)
 {
 	int i = 0;
 	for (i = 0; i < ARRAY_LENGTH; ++i)
@@ -56,7 +68,7 @@ void zeroArray(char* array)
 /**
  * A little bit of magic to sets f to x^79 + x^9 + 1 according to assignment
  */
-void setF(char* f)
+void setF(uint8_t* f)
 {
 	zeroArray(f);
 	f[0] |= 1 << 7;
@@ -71,10 +83,19 @@ void setF(char* f)
 /*****************************************************************************************************************************/
 /*****************************************************************************************************************************/
 
-int main(int argc, char** argv)
+int main(int argc, uint8_t** argv)
 {
-	char f[ARRAY_LENGTH];
+	uint8_t f[ARRAY_LENGTH];
 	setF(f);
+
+	uint8_t P_x[ARRAY_LENGTH];
+	zeroArray(P_x);
+	printHexWhole(P_x);
+
+	// x_P = 30CB 127B63E4 2792F10F
+	// y_P = 547B 2C88266B B04F713B
+	// x_Q = 0020 2A9F0350 14497325
+	// y_Q = 5175 A6485955 2F97C129
 
 	return 0;
 }
