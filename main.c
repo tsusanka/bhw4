@@ -47,9 +47,8 @@ void printHexWhole(uint8_t* array)
 	int i = 0;
 	for (i = 0; i < ARRAY_LENGTH; ++i)
 	{
-		printf("%x ", array[i]);
+		printf("%2x ", array[i]);
 	}
-	printf("\n");
 }
 
 
@@ -77,7 +76,48 @@ void setF(uint8_t* f)
 	if (DEBUG) {
 		printf("f is: ");
 		printBinWhole(f);
+		printf("\n");
 	}
+}
+
+/**
+ * Reads input from stdin
+ */
+uint8_t loadInput(uint8_t* P_x, uint8_t* P_y, uint8_t* Q_x, uint8_t* Q_y)
+{
+	zeroArray(P_x);
+	zeroArray(P_y);
+	zeroArray(Q_x);
+	zeroArray(Q_y);
+	int res = 0;
+
+	printf("Enter P_x:");
+	res += scanf("%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x", &P_x[0], &P_x[1], &P_x[2], &P_x[3], &P_x[4], &P_x[5], &P_x[6], &P_x[7], &P_x[8], &P_x[9]);
+	printf("\nEnter P_y:");
+	res += scanf("%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x", &P_y[0], &P_y[1], &P_y[2], &P_y[3], &P_y[4], &P_y[5], &P_y[6], &P_y[7], &P_y[8], &P_y[9]);
+	printf("\nEnter Q_x:");
+	res += scanf("%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x", &Q_x[0], &Q_x[1], &Q_x[2], &Q_x[3], &Q_x[4], &Q_x[5], &Q_x[6], &Q_x[7], &Q_x[8], &Q_x[9]);
+	printf("\nEnter Q_y:");
+	res += scanf("%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x", &Q_y[0], &Q_y[1], &Q_y[2], &Q_y[3], &Q_y[4], &Q_y[5], &Q_y[6], &Q_y[7], &Q_y[8], &Q_y[9]);
+	printf("\n");
+
+	return res;
+}
+
+/**
+ * Prints P, Q in hex
+ */
+void printCoordinates(uint8_t* P_x, uint8_t* P_y, uint8_t* Q_x, uint8_t* Q_y)
+{
+	printf("P: ");
+	printHexWhole(P_x);
+	printf(", ");
+	printHexWhole(P_y);
+	printf("\nQ: ");
+	printHexWhole(Q_x);
+	printf(", ");
+	printHexWhole(Q_y);
+	printf("\n");
 }
 
 /*****************************************************************************************************************************/
@@ -86,16 +126,17 @@ void setF(uint8_t* f)
 int main(int argc, uint8_t** argv)
 {
 	uint8_t f[ARRAY_LENGTH];
-	setF(f);
-
 	uint8_t P_x[ARRAY_LENGTH];
-	zeroArray(P_x);
-	printHexWhole(P_x);
+	uint8_t P_y[ARRAY_LENGTH];
+	uint8_t Q_x[ARRAY_LENGTH];
+	uint8_t Q_y[ARRAY_LENGTH];
 
-	// x_P = 30CB 127B63E4 2792F10F
-	// y_P = 547B 2C88266B B04F713B
-	// x_Q = 0020 2A9F0350 14497325
-	// y_Q = 5175 A6485955 2F97C129
+	setF(f);
+	loadInput(P_x, P_y, Q_x, Q_y);
+
+	printCoordinates(P_x, P_y, Q_x, Q_y);
+
+	
 
 	return 0;
 }
