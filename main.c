@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include <assert.h>
 #include <stdbool.h>
 
@@ -21,7 +22,10 @@
 #define LENGTH 79
 #define ARRAY_LENGTH 10
 
-uint8_t pattern[8] = {0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
+#define ONE_NOT_FOUND 9
+
+uint8_t pattern[8] = {0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01};
+
 
 void printBin(uint8_t x)
 {
@@ -76,9 +80,9 @@ void setF(uint8_t* f)
 	f[9] |= 1 << 0;
 	f[8] |= 1 << 1;
 	if (DEBUG) {
-		printf("f is: ");
-		printBinWhole(f,ARRAY_LENGTH);
-		printf("\n");
+		// printf("f is: ");
+		// printBinWhole(f,ARRAY_LENGTH);
+		// printf("\n");
 	}
 }
 
@@ -127,8 +131,8 @@ void simpleMod(uint8_t* number, int length) {               //Carry is in x^80 s
     int i = 0;
 
     if (length == ARRAY_LENGTH) {
-        number[8] ^= pattern[2];
-        number[9] ^= pattern[1];
+        number[8] ^= pattern[5];
+        number[9] ^= pattern[6];
     } else if (length == 2*ARRAY_LENGTH){
 
     }
@@ -136,21 +140,21 @@ void simpleMod(uint8_t* number, int length) {               //Carry is in x^80 s
 
 void addition(uint8_t* a, uint8_t* b, uint8_t* res, int length) {
     int i;
-    uint8_t carry = 0x00;          //Carry
+    uint8_t carry = 0x00;
 
     for (i = length - 1; i >= 0; i--) {
         res[i] = a[i] + b[i] + carry;
         carry = 0x00;
-        if  (res[i] < a[i]) carry = pattern[0];
+        if  (res[i] < a[i]) carry = pattern[7];
         printf("\nCarry=%2x",carry);
     }
 
     if ((res[0] & 0x80) > 0x00) {
-        res[8] ^= pattern[1];
-        res[9] ^= pattern[0];
+        res[8] ^= pattern[6];
+        res[9] ^= pattern[7];
     }
 
-    if (carry == pattern[0]) simpleMod(res,length);
+    if (carry == pattern[7]) simpleMod(res,length);
 }
 
 void shiftOneToLeft(uint8_t* number, int length) {
@@ -159,7 +163,7 @@ void shiftOneToLeft(uint8_t* number, int length) {
 
     for(i = 0; i < length; i++) {
         if ((number[i] > 0x00) && (i > 0)) {
-            if ((0x80 & number[i]) > 0x00) number[i-1] += pattern[0];
+            if ((0x80 & number[i]) > 0x00) number[i-1] += pattern[7];
         }
         number[i] = number[i] << 1;
     }
@@ -173,7 +177,6 @@ void squareNumber(uint8_t* number) {
     int tempCounter = 0;
 
     int head = 0;
-    bool flag = false;
     uint8_t tempNum1[2*ARRAY_LENGTH];
     uint8_t tempNum2[2*ARRAY_LENGTH];
 
@@ -188,8 +191,8 @@ void squareNumber(uint8_t* number) {
     printf("\nAfter MEMCPY TEMP1\n");
     printBinWhole(tempNum1,2*ARRAY_LENGTH);
 
-    while(!flag) {
-        if (((number[ARRAY_LENGTH - (counter/8) -1]) & (pattern[counter%8])) > 0x00) {
+    for (counter = 0; counter < 6; counter++) {
+        if (((number[ARRAY_LENGTH - (counter/8) -1]) & (pattern[7-(counter%8)])) > 0x00) { // counter % 8 might correct
             for (i = 0; i < counter-counter2; i++) {
                 shiftOneToLeft(tempNum2,2*ARRAY_LENGTH);
                 tempCounter++;
@@ -207,9 +210,6 @@ void squareNumber(uint8_t* number) {
             printf("\nAfter Squaring addition: \n");
             printBinWhole(tempNum1,2*ARRAY_LENGTH);
         }
-
-        counter++;
-        if (counter > LENGTH) flag = true;
     }
 
     //printBinWhole(tempNum2,2*ARRAY_LENGTH);
@@ -228,51 +228,60 @@ uint8_t doubling(uint8_t* P_x, uint8_t* P_y) {
 
 }
 
+void mod(uint8_t* huge, int hugeLength)
+{
+    int i, y, position = 0;
+    for (i = 0; i < hugeLength; i++)
+    {
+        for (y = 0; y < 8; y++)
+        {
+            if ((huge[i] & pattern[y]) > 0) // looking for 1
+            {
+                position = (8 * i) + y;
+                if (position > (hugeLength*8 - LENGTH))
+                {
+                    return;
+                }
+                position += 70;
+                huge[i] = huge[i] ^ pattern[y];
+                huge[position / 8] = huge[position / 8] ^ pattern[position % 8];
+                position += 9;
+                huge[position / 8] = huge[position / 8] ^ pattern[position % 8];
+            }
+        }
+    }
+}
+
 /*****************************************************************************************************************************/
 /*****************************************************************************************************************************/
 
 int main(int argc, uint8_t** argv)
 {
 	uint8_t f[ARRAY_LENGTH];
-
-    /**
-        x_P = 30CB 127B63E4 2792F10F
-        y_P = 547B 2C88266B B04F713B
-        x_Q = 0020 2A9F0350 14497325
-        y_Q = 5175 A6485955 2F97C129
-        a = 4A2E 38A8F66D 7F4C385F
-        b = 2C0B B31C6BEC C03D68A7
-    */
-	uint8_t P_x[ARRAY_LENGTH] = {0x30,0xCB,0x12,0x7B,0x63,0xE4,0x27,0x92,0xF1,0x0F};
-	uint8_t P_y[ARRAY_LENGTH] = {0x54,0x7B,0x2C,0x88,0x26,0x6B,0xB0,0x4F,0x71,0x3B};
-	uint8_t Q_x[ARRAY_LENGTH] = {0x00,0x20,0x2A,0x9F,0x03,0x50,0x14,0x49,0x73,0x25};
-	uint8_t Q_y[ARRAY_LENGTH] = {0x51,0x75,0xA6,0x48,0x59,0x55,0x2F,0x97,0xC1,0x29};
+    uint8_t P_x[ARRAY_LENGTH];
+    uint8_t P_y[ARRAY_LENGTH];      
+    uint8_t Q_x[ARRAY_LENGTH];      
+    uint8_t Q_y[ARRAY_LENGTH];      
     uint8_t a[ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F};      //Defying our EC
 	uint8_t b[ARRAY_LENGTH] = {0x2C,0x75,0xA6,0x48,0x59,0x55,0x2F,0x97,0xC1,0x29};      //Defying our EC
 	uint8_t temp[ARRAY_LENGTH];
 
+
+    // loadInput(P_x, P_y, Q_x, Q_y);
 	setF(f);
 
-    //loadInput(P_x, P_y, Q_x, Q_y);
-    //printBin(P_x[0] ^ P_x[1]);
+    // uint8_t huge[2*ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F,0x2C,0x75,0xA6,0x48,0x59,0x55,0x2F,0x97,0xC1,0x29};
+    uint8_t huge[2*ARRAY_LENGTH] = {0xBA,0x11,0x23,0x48,0x2F,0x1D,0x22,0x33,0xC3,0x98,0x11,0xCC,0xAA,0xA8,0x19,0x25,0x3F,0x17,0x55,0x19};
 
-    printf("a\n");
-    printBinWhole(a,ARRAY_LENGTH);
-    printf("b\n");
-    printBinWhole(b,ARRAY_LENGTH);
-	//printCoordinates(P_x, P_y, Q_x, Q_y);
-
-    printf("a+b\n");
-	addition(a,b,temp,ARRAY_LENGTH);
-
-	printf("\n TEMP after addition (a+b) \n");
-    printBinWhole(temp,ARRAY_LENGTH);
-
-
-    squareNumber(temp);
-
-    //printf("\n TEMP after square\n");
-    //printBinWhole(temp,ARRAY_LENGTH);
+    printf("We're saying that\n");
+    printBinWhole(huge, 2*ARRAY_LENGTH);
+    printf("mod \n");
+    printBinWhole(f, ARRAY_LENGTH);
+    printf("is:\n");
+    
+    mod(huge, 2*ARRAY_LENGTH);
+    printBinWhole(huge, 2*ARRAY_LENGTH);
+    
 
 	return 0;
 }
