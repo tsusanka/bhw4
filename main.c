@@ -244,8 +244,8 @@ void lfsr(uint8_t* number)
 void mult(uint8_t* a, uint8_t* b, uint8_t* result)
 {
     uint8_t tmp = 128; // 2^7
-    int i,j  = 0;
- 
+    int i, j  = 0;
+
     for(i = 0; i < ARRAY_LENGTH; i++) 
     {
         for (j = 0; j < 8; j++)
@@ -254,7 +254,7 @@ void mult(uint8_t* a, uint8_t* b, uint8_t* result)
             {
                 add(result, a, result);
             }
-            if (j == 7) break;
+            if ((i == ARRAY_LENGTH - 1) && (j == 7)) break;
             lfsr(result);
             tmp = tmp >> 1;
         }
@@ -271,29 +271,33 @@ int main(int argc, uint8_t** argv)
     uint8_t P_y[ARRAY_LENGTH];      
     uint8_t Q_x[ARRAY_LENGTH];      
     uint8_t Q_y[ARRAY_LENGTH];      
-    uint8_t a[ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F};      //Defying our EC
-	uint8_t b[ARRAY_LENGTH] = {0x2C,0x75,0xA6,0x48,0x59,0x55,0x2F,0x97,0xC1,0x29};      //Defying our EC
+    // uint8_t a[ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F};      //Defying our EC
+// 	uint8_t b[ARRAY_LENGTH] = {0x2C,0x75,0xA6,0x48,0x59,0x55,0x2F,0x97,0xC1,0x29};      //Defying our EC
 	uint8_t temp[ARRAY_LENGTH];
 
-    uint8_t result[2*ARRAY_LENGTH];
-    zeroArray(result, 2*ARRAY_LENGTH);
+    uint8_t result[ARRAY_LENGTH];
+    zeroArray(result, ARRAY_LENGTH);
 
     // loadInput(P_x, P_y, Q_x, Q_y);
-    
-    uint8_t aa[ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0xf5,0x5F};
-    printBinWhole(aa, ARRAY_LENGTH);
-    lfsr(aa);
-    printBinWhole(aa, ARRAY_LENGTH);
-    return 2;
 
-    printf("We're saying that\n");
+
+    uint8_t a[ARRAY_LENGTH] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01};      //Defying our EC
+	uint8_t b[ARRAY_LENGTH] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0xf3};      //Defying our EC
+
+    printf("a = ");
     printBinWhole(a, ARRAY_LENGTH);
-    printf(" * ");
+    printf("b = ");
     printBinWhole(b, ARRAY_LENGTH);
-    printf(" :\n");
+
+    // a = shiftOneToLeft(a, ARRAY_LENGTH);
+    // printBinWhole(a);
+    // return 2;
     
+    printf("\n a*b: \n");
     mult(a, b, result);
     printBinWhole(result, ARRAY_LENGTH);
+    printf("\n");
+    
 
 	return 0;
 }
