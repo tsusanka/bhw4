@@ -213,7 +213,7 @@ uint8_t doubling(uint8_t* P_x, uint8_t* P_y) {
 
 }
 
-void mod(uint8_t* huge, int hugeLength)
+void mod(uint8_t* huge, int hugeLength, uint8_t* smaller)
 {
     int i, y, position = 0;
     for (i = 0; i < hugeLength; i++)
@@ -235,6 +235,7 @@ void mod(uint8_t* huge, int hugeLength)
             }
         }
     }
+    memcpy(smaller, huge, ARRAY_LENGTH);
 }
 
 /*****************************************************************************************************************************/
@@ -259,7 +260,12 @@ int main(int argc, uint8_t** argv)
     printBinWhole(huge, 2*ARRAY_LENGTH);
     printf("mod x^79 + x^9 + 1 is:\n");
     
-    mod(huge, 2*ARRAY_LENGTH);
+    uint8_t smaller[ARRAY_LENGTH];
+    zeroArray(smaller, ARRAY_LENGTH);
+
+    mod(huge, 2*ARRAY_LENGTH, smaller);
+
+    printBinWhole(smaller, ARRAY_LENGTH);
     printBinWhole(huge, 2*ARRAY_LENGTH);
     
 
