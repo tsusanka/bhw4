@@ -208,6 +208,58 @@ void add(uint8_t* a, uint8_t* b, uint8_t* result)
     }
 }
 
+/**
+ * 
+ **/
+void lfsr(uint8_t* number)
+{
+    uint8_t x9, i, x78, x8, tmp = 0x00;
+
+    x78 = number[0] & pattern[1];
+    x8 = number[8] & pattern[7];
+    x78 >>= 6;
+    x9 = x78 ^ x8;
+    x9 <<= 1;
+
+    for(i = 0; i < ARRAY_LENGTH; i++)
+    {
+        if ((number[i] > 0x00) && (i > 0))
+        {
+            if ((0x80 & number[i]) > 0x00) number[i-1] += pattern[7];
+        }
+        
+        number[i] = number[i] << 1;
+        
+        if (i == 8) // number[0] & pattern[1] is x^78; number[i] & pattern[7] is x^8; & pattern[6] gets rid off the other bits
+        {
+            tmp = number[8] & ~pattern[6]; // destroys 6. bit
+            number[i] = tmp | x9;
+        }
+    }
+}
+
+void mult(uint8_t* a, uint8_t* b, uint8_t* result)
+{
+    uint8_t tmp = 128; // 2^7
+    int i,j  = 0;
+    
+    //memcpy(huge + sizeof(uint8_t)*ARRAY_LENGTH, number, ARRAY_LENGTH);
+ 
+    for(i = 0; i < ARRAY_LENGTH; i++) 
+    {
+        for (j = 0; j < 8; j++)
+        {
+            if (a[i] & tmp)
+            {
+                add(result, a, result);
+            }
+            if (j == 7) break;
+            lfsr(result);
+            tmp = tmp >> 1;
+        }
+        tmp = 128;
+    }
+}
 
 /*****************************************************************************************************************************/
 /*****************************************************************************************************************************/
@@ -221,19 +273,25 @@ int main(int argc, uint8_t** argv)
     uint8_t a[ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F};      //Defying our EC
 	uint8_t b[ARRAY_LENGTH] = {0x2C,0x75,0xA6,0x48,0x59,0x55,0x2F,0x97,0xC1,0x29};      //Defying our EC
 	uint8_t temp[ARRAY_LENGTH];
-	uint8_t result[ARRAY_LENGTH];
 
+    uint8_t result[2*ARRAY_LENGTH];
+    zeroArray(result, 2*ARRAY_LENGTH);
 
     // loadInput(P_x, P_y, Q_x, Q_y);
-
-    uint8_t num[ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F};
-
-    // printf("We're saying that\n");
-    // printBinWhole(num, ARRAY_LENGTH);
-    // printf("^2 mod (x^79 + x^9 + 1) is:\n");
-
     
-    add(a,b,result);
+    uint8_t aa[ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0xf5,0x5F};
+    printBinWhole(aa, ARRAY_LENGTH);
+    lfsr(aa);
+    printBinWhole(aa, ARRAY_LENGTH);
+    return 2;
+
+    printf("We're saying that\n");
+    printBinWhole(a, ARRAY_LENGTH);
+    printf(" * ");
+    printBinWhole(b, ARRAY_LENGTH);
+    printf(" :\n");
+    
+    mult(a, b, result);
     printBinWhole(result, ARRAY_LENGTH);
 
 	return 0;
