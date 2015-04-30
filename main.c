@@ -111,18 +111,6 @@ void printCoordinates(uint8_t* P_x, uint8_t* P_y, uint8_t* Q_x, uint8_t* Q_y)
 	printf("\n");
 }
 
-void simpleMod(uint8_t* number, int length) {               //Carry is in x^80 spot and nothing else.
-
-    int i = 0;
-
-    if (length == ARRAY_LENGTH) {
-        number[8] ^= pattern[5];
-        number[9] ^= pattern[6];
-    } else if (length == 2*ARRAY_LENGTH){
-
-    }
-}
-
 void addition(uint8_t* a, uint8_t* b, uint8_t* res, int length) {
     int i;
     uint8_t carry = 0x00;
@@ -153,52 +141,6 @@ void shiftOneToLeft(uint8_t* number, int length) {
         number[i] = number[i] << 1;
     }
 }
-
-/*void squareNumber(uint8_t* number) {
-    int i = 0;
-
-    int counter = 0;
-    int counter2 = 0;
-    int tempCounter = 0;
-
-    int head = 0;
-    uint8_t tempNum1[2*ARRAY_LENGTH];
-    uint8_t tempNum2[2*ARRAY_LENGTH];
-
-    zeroArray(tempNum1,2*ARRAY_LENGTH);
-    zeroArray(tempNum2,2*ARRAY_LENGTH);
-
-    memcpy(tempNum2+sizeof(uint8_t)*ARRAY_LENGTH, number, sizeof(uint8_t)*ARRAY_LENGTH);
-
-    printf("\nAfter MEMCPY TEMP2\n");
-    printBinWhole(tempNum2,2*ARRAY_LENGTH);
-
-    printf("\nAfter MEMCPY TEMP1\n");
-    printBinWhole(tempNum1,2*ARRAY_LENGTH);
-
-    for (counter = 0; counter < 6; counter++) {
-        if (((number[ARRAY_LENGTH - (counter/8) -1]) & (pattern[7-(counter%8)])) > 0x00) { // counter % 8 might correct
-            for (i = 0; i < counter-counter2; i++) {
-                shiftOneToLeft(tempNum2,2*ARRAY_LENGTH);
-                tempCounter++;
-            }
-            counter2 += tempCounter;
-            tempCounter = 0;
-
-            printf("\nBefore Squaring addition: \n");
-            printBinWhole(tempNum1,2*ARRAY_LENGTH);
-            printf("\n+\n");
-            printBinWhole(tempNum2,2*ARRAY_LENGTH);
-
-            addition(tempNum1,tempNum2,tempNum1,2*ARRAY_LENGTH);
-
-            printf("\nAfter Squaring addition: \n");
-            printBinWhole(tempNum1,2*ARRAY_LENGTH);
-        }
-    }
-
-    //printBinWhole(tempNum2,2*ARRAY_LENGTH);
-}*/
 
 uint8_t computeC(uint8_t* b) {      //computed from b by m � 2 squarings
     int i = 0;
