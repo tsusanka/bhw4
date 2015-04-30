@@ -111,25 +111,6 @@ void printCoordinates(uint8_t* P_x, uint8_t* P_y, uint8_t* Q_x, uint8_t* Q_y)
 	printf("\n");
 }
 
-void addition(uint8_t* a, uint8_t* b, uint8_t* res, int length) {
-    int i;
-    uint8_t carry = 0x00;
-
-    for (i = length - 1; i >= 0; i--) {
-        res[i] = a[i] + b[i] + carry;
-        carry = 0x00;
-        if  (res[i] < a[i]) carry = pattern[7];
-        printf("\nCarry=%2x",carry);
-    }
-
-    if ((res[0] & 0x80) > 0x00) {
-        res[8] ^= pattern[6];
-        res[9] ^= pattern[7];
-    }
-
-    if (carry == pattern[7]) simpleMod(res,length);
-}
-
 void shiftOneToLeft(uint8_t* number, int length) {
     int i;
     int n;
@@ -181,6 +162,37 @@ void mod(uint8_t* huge, int hugeLength, uint8_t* smaller)
     memcpy(smaller, huge + ARRAY_LENGTH*sizeof(uint8_t), ARRAY_LENGTH);
 }
 
+/**
+ * Insert zeros between bits.
+ * Eg 00000111 => 00010101
+ **/
+uint8_t insertZeros(uint8_t input)
+{
+    return (input & 1)
+       | ((input & 2) << 1)
+       | ((input & 4) << 2)
+       | ((input & 8) << 3)
+       | ((input & 16) << 4);
+}
+
+void square(uint8_t* number)
+{
+    uint8_t i, lowNibble, highNibble, temp = 0;
+
+    uint8_t huge[2*ARRAY_LENGTH];
+    zeroArray(huge,2*ARRAY_LENGTH);
+    
+    for(i = 0; i < ARRAY_LENGTH; i++)
+    {
+        highNibble = (number[i] >> 4) & 0x0F;
+        lowNibble = number[i] & 0x0F;
+        huge[temp++] = insertZeros(highNibble);
+        huge[temp++] = insertZeros(lowNibble);
+    }
+
+    mod(huge, 2*ARRAY_LENGTH, number);
+}
+
 /*****************************************************************************************************************************/
 /*****************************************************************************************************************************/
 
@@ -197,20 +209,15 @@ int main(int argc, uint8_t** argv)
 
     // loadInput(P_x, P_y, Q_x, Q_y);
 
-    uint8_t huge[2*ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F,0x2C,0x75,0xA6,0x48,0x59,0x55,0x2F,0x97,0xC1,0x29};
+    uint8_t num[ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F};
 
     printf("We're saying that\n");
-    printBinWhole(huge, 2*ARRAY_LENGTH);
-    printf("mod x^79 + x^9 + 1 is:\n");
+    printBinWhole(num, ARRAY_LENGTH);
+    printf("^2 mod (x^79 + x^9 + 1) is:\n");
     
-    uint8_t smaller[ARRAY_LENGTH];
-    zeroArray(smaller, ARRAY_LENGTH);
+    square(num);
 
-    mod(huge, 2*ARRAY_LENGTH, smaller);
-
-    printBinWhole(smaller, ARRAY_LENGTH);
-    printBinWhole(huge, 2*ARRAY_LENGTH);
-    
+    printBinWhole(num, ARRAY_LENGTH);
 
 	return 0;
 }
