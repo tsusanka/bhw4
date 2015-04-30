@@ -154,7 +154,7 @@ void shiftOneToLeft(uint8_t* number, int length) {
     }
 }
 
-void squareNumber(uint8_t* number) {
+/*void squareNumber(uint8_t* number) {
     int i = 0;
 
     int counter = 0;
@@ -198,9 +198,9 @@ void squareNumber(uint8_t* number) {
     }
 
     //printBinWhole(tempNum2,2*ARRAY_LENGTH);
-}
+}*/
 
-uint8_t computeC(uint8_t* b) {      //computed from b by m – 2 squarings
+uint8_t computeC(uint8_t* b) {      //computed from b by m ï¿½ 2 squarings
     int i = 0;
 
     for(i = 0; i < LENGTH - 2; i++) {
@@ -225,6 +225,7 @@ void mod(uint8_t* huge, int hugeLength, uint8_t* smaller)
                 position = (8 * i) + y;
                 if (position > (hugeLength*8 - LENGTH))
                 {
+                    memcpy(smaller, huge + ARRAY_LENGTH*sizeof(uint8_t), ARRAY_LENGTH);
                     return;
                 }
                 position += 70;
@@ -235,7 +236,7 @@ void mod(uint8_t* huge, int hugeLength, uint8_t* smaller)
             }
         }
     }
-    memcpy(smaller, huge, ARRAY_LENGTH);
+    memcpy(smaller, huge + ARRAY_LENGTH*sizeof(uint8_t), ARRAY_LENGTH);
 }
 
 /*****************************************************************************************************************************/
