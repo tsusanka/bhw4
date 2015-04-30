@@ -209,7 +209,7 @@ void add(uint8_t* a, uint8_t* b, uint8_t* result)
 }
 
 /**
- * 
+ * Linear feedback shift register implements A=Ax
  **/
 void lfsr(uint8_t* number)
 {
@@ -238,18 +238,19 @@ void lfsr(uint8_t* number)
     }
 }
 
+/**
+ * Multiplies a * b and stores it in result.
+ **/
 void mult(uint8_t* a, uint8_t* b, uint8_t* result)
 {
     uint8_t tmp = 128; // 2^7
     int i,j  = 0;
-    
-    //memcpy(huge + sizeof(uint8_t)*ARRAY_LENGTH, number, ARRAY_LENGTH);
  
     for(i = 0; i < ARRAY_LENGTH; i++) 
     {
         for (j = 0; j < 8; j++)
         {
-            if (a[i] & tmp)
+            if (b[i] & tmp)
             {
                 add(result, a, result);
             }
