@@ -70,21 +70,6 @@ void zeroArray(uint8_t* array, int length)
 	}
 }
 
-/**
- * A little bit of magic to sets f to x^79 + x^9 + 1 according to assignment
- */
-void setF(uint8_t* f)
-{
-	zeroArray(f,ARRAY_LENGTH);
-	f[0] |= 1 << 7;
-	f[9] |= 1 << 0;
-	f[8] |= 1 << 1;
-	if (DEBUG) {
-		// printf("f is: ");
-		// printBinWhole(f,ARRAY_LENGTH);
-		// printf("\n");
-	}
-}
 
 /**
  * Reads input from stdin
@@ -257,7 +242,6 @@ void mod(uint8_t* huge, int hugeLength)
 
 int main(int argc, uint8_t** argv)
 {
-	uint8_t f[ARRAY_LENGTH];
     uint8_t P_x[ARRAY_LENGTH];
     uint8_t P_y[ARRAY_LENGTH];      
     uint8_t Q_x[ARRAY_LENGTH];      
@@ -268,16 +252,12 @@ int main(int argc, uint8_t** argv)
 
 
     // loadInput(P_x, P_y, Q_x, Q_y);
-	setF(f);
 
-    // uint8_t huge[2*ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F,0x2C,0x75,0xA6,0x48,0x59,0x55,0x2F,0x97,0xC1,0x29};
-    uint8_t huge[2*ARRAY_LENGTH] = {0xBA,0x11,0x23,0x48,0x2F,0x1D,0x22,0x33,0xC3,0x98,0x11,0xCC,0xAA,0xA8,0x19,0x25,0x3F,0x17,0x55,0x19};
+    uint8_t huge[2*ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F,0x2C,0x75,0xA6,0x48,0x59,0x55,0x2F,0x97,0xC1,0x29};
 
     printf("We're saying that\n");
     printBinWhole(huge, 2*ARRAY_LENGTH);
-    printf("mod \n");
-    printBinWhole(f, ARRAY_LENGTH);
-    printf("is:\n");
+    printf("mod x^79 + x^9 + 1 is:\n");
     
     mod(huge, 2*ARRAY_LENGTH);
     printBinWhole(huge, 2*ARRAY_LENGTH);
