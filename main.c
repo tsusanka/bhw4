@@ -175,7 +175,10 @@ uint8_t insertZeros(uint8_t input)
        | ((input & 16) << 4);
 }
 
-void square(uint8_t* number)
+/**
+ * Creates number^2 and stores output in result
+ **/
+void square(uint8_t* number, uint8_t* result)
 {
     uint8_t i, lowNibble, highNibble, temp = 0;
 
@@ -190,8 +193,21 @@ void square(uint8_t* number)
         huge[temp++] = insertZeros(lowNibble);
     }
 
-    mod(huge, 2*ARRAY_LENGTH, number);
+    mod(huge, 2*ARRAY_LENGTH, result);
 }
+
+/**
+ * Adds a + b and stores output in result
+ **/
+void add(uint8_t* a, uint8_t* b, uint8_t* result)
+{
+    int i = 0;
+    for (i = 0; i < ARRAY_LENGTH; i++)
+    {
+        result[i] = a[i] ^ b[i];
+    }
+}
+
 
 /*****************************************************************************************************************************/
 /*****************************************************************************************************************************/
@@ -205,19 +221,20 @@ int main(int argc, uint8_t** argv)
     uint8_t a[ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F};      //Defying our EC
 	uint8_t b[ARRAY_LENGTH] = {0x2C,0x75,0xA6,0x48,0x59,0x55,0x2F,0x97,0xC1,0x29};      //Defying our EC
 	uint8_t temp[ARRAY_LENGTH];
+	uint8_t result[ARRAY_LENGTH];
 
 
     // loadInput(P_x, P_y, Q_x, Q_y);
 
     uint8_t num[ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F};
 
-    printf("We're saying that\n");
-    printBinWhole(num, ARRAY_LENGTH);
-    printf("^2 mod (x^79 + x^9 + 1) is:\n");
-    
-    square(num);
+    // printf("We're saying that\n");
+    // printBinWhole(num, ARRAY_LENGTH);
+    // printf("^2 mod (x^79 + x^9 + 1) is:\n");
 
-    printBinWhole(num, ARRAY_LENGTH);
+    
+    add(a,b,result);
+    printBinWhole(result, ARRAY_LENGTH);
 
 	return 0;
 }
