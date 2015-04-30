@@ -262,41 +262,143 @@ void mult(uint8_t* a, uint8_t* b, uint8_t* result)
     }
 }
 
+int isEqualTo(uint8_t needle, uint8_t * haystack)
+{
+    for (i = 0; i < ARRAY_LENGTH - 1; i++)
+    {
+        if (haystack[i] != 0x00) return 0;
+    }
+    if (haystack[ARRAY_LENGTH - 1] == needle)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+void ellipticAddition(uint8_t* a, uint8_t* b, uint8_t* P_x, uint8_t* P_y, uint8_t* P_z, uint8_t* Q_x, uint8_t* Q_y, uint8_t* Q_z, uint8_t* R_x, uint8_t* R_y, uint8_t* R_z)
+{
+    uint8_t* t1[ARRAY_LENGTH];
+    uint8_t* t2[ARRAY_LENGTH];
+    uint8_t* t3[ARRAY_LENGTH];
+    uint8_t* t4[ARRAY_LENGTH];
+    uint8_t* t5[ARRAY_LENGTH];
+    uint8_t* t6[ARRAY_LENGTH];
+    uint8_t* t7[ARRAY_LENGTH];
+    uint8_t* t8[ARRAY_LENGTH];
+    uint8_t* t9[ARRAY_LENGTH];
+    zeroArray(t1);
+    zeroArray(t2);
+    zeroArray(t3);
+    zeroArray(t4);
+    zeroArray(t5);
+    zeroArray(t6);
+    zeroArray(t7);
+    zeroArray(t8);
+    zeroArray(t9);
+    
+    t1 = P_x; // copy?
+    t2 = P_y;
+    t3 = P_z;
+    t4 = Q_x;
+    t5 = Q_y; // step 5
+    
+    if (!isEqualTo(0, a))
+    {
+        t9 = a;
+    }
+
+    if (!isEqualTo(1, Q_z))
+    {
+        t6 = Q_z;
+        mult(t6, t6, t7); // todo: replace with square?
+        mult(t1, t7, t1);
+        mult(t6, t7, t7);
+        mult(t2, t7, t2);
+    }
+    mult(t3, t3, t7); // step 8
+    mult(t4, t7, t8);
+    add(t1, t8, t1);
+    mult(t3, t7, t7);
+    mult(t5, t7, t8);
+    add(t2, t8, t2); // step 13
+    
+    if (isEqualTo(0, t1))
+    {
+        if (isEqualTo(0, t2))
+        {
+            // (0, 0, 0)
+            return;
+        }
+        else
+        {
+            // (1, 1, 0)
+            R_x[ARRAY_LENGTH - 1] = 0x01;
+            R_y[ARRAY_LENGTH - 1] = 0x01;
+            return;
+        }
+        
+    }
+
+    mult(t2, t4, t4); // step 15
+    mult(t1, t3, t3);
+    mult(t3, t5, t5);
+    add(t4, t5, t4); // step 18
+    mult(t3, t3, t5);
+    mult(t4, t5, t7);
+    
+    if (!isEqualTo(1, Q_z))
+    {
+        mult(t3, t6, t3);
+    }
+    
+    add(t2, t3, t4); // step 22
+    mult(t2, t4, t2);
+    mult(t1, t1, t5);
+    mult(t1, t5, t1); // step 25
+    
+    if (!isEqualTo(0, a))
+    {
+        mult(t3, t3, t8);
+        mult(t8, t9, t9);
+        add(t1, t9, t1);
+    }
+    
+    add(t1, t2, t1); // step 27
+    mult(t1, t4, t4);
+    add(t4, t7, t2);
+    R_x = t1;
+    R_y = t2;
+    R_z = t3;
+}
+
 /*****************************************************************************************************************************/
 /*****************************************************************************************************************************/
 
 int main(int argc, uint8_t** argv)
 {
     uint8_t P_x[ARRAY_LENGTH];
-    uint8_t P_y[ARRAY_LENGTH];      
+    uint8_t P_y[ARRAY_LENGTH];
+    uint8_t P_z[ARRAY_LENGTH];
     uint8_t Q_x[ARRAY_LENGTH];      
-    uint8_t Q_y[ARRAY_LENGTH];      
-    // uint8_t a[ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F};      //Defying our EC
-// 	uint8_t b[ARRAY_LENGTH] = {0x2C,0x75,0xA6,0x48,0x59,0x55,0x2F,0x97,0xC1,0x29};      //Defying our EC
+    uint8_t Q_y[ARRAY_LENGTH];
+    uint8_t Q_z[ARRAY_LENGTH];
+    uint8_t R_x[ARRAY_LENGTH];      
+    uint8_t R_y[ARRAY_LENGTH];
+    uint8_t R_z[ARRAY_LENGTH];  
+    uint8_t a[ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F};      //Defying our EC
+    uint8_t b[ARRAY_LENGTH] = {0x2C,0x75,0xA6,0x48,0x59,0x55,0x2F,0x97,0xC1,0x29};      //Defying our EC
 	uint8_t temp[ARRAY_LENGTH];
 
     uint8_t result[ARRAY_LENGTH];
     zeroArray(result, ARRAY_LENGTH);
 
-    // loadInput(P_x, P_y, Q_x, Q_y);
-
-
-    uint8_t a[ARRAY_LENGTH] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01};      //Defying our EC
-	uint8_t b[ARRAY_LENGTH] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0xf3};      //Defying our EC
-
-    printf("a = ");
-    printBinWhole(a, ARRAY_LENGTH);
-    printf("b = ");
-    printBinWhole(b, ARRAY_LENGTH);
-
-    // a = shiftOneToLeft(a, ARRAY_LENGTH);
-    // printBinWhole(a);
-    // return 2;
+    loadInput(P_x, P_y, Q_x, Q_y);
     
-    printf("\n a*b: \n");
-    mult(a, b, result);
-    printBinWhole(result, ARRAY_LENGTH);
-    printf("\n");
+    ellipticAddition(a, b, P_x, P_y, P_z, Q_x, Q_y, Q_z, R_x, R_y, R_z);
+
+    // square(a, result);
+    // printBinWhole(result, ARRAY_LENGTH);
+    // printf("\n");
     
 
 	return 0;
