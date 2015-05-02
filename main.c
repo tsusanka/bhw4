@@ -45,16 +45,17 @@ void printBinWhole(uint8_t* array, int length)
 	{
 		printBin(array[i]);
 	}
-	printf("\n");
+    printf("\n");
 }
 
 void printHexWhole(uint8_t* array, int length)
 {
-	int i = 0;
-	for (i = 0; i < length; ++i)
-	{
-		printf("%2x ", array[i]);
-	}
+    int i = 0;
+    for (i = 0; i < length; ++i)
+    {
+        printf("%02x", array[i]);
+    }
+	printf("\n");
 }
 
 
@@ -280,23 +281,23 @@ int main(int argc, uint8_t** argv)
 
     // loadInput(P_x, P_y, Q_x, Q_y);
 
-
-    uint8_t a[ARRAY_LENGTH] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01};      //Defying our EC
-	uint8_t b[ARRAY_LENGTH] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0xf3};      //Defying our EC
+    // uint8_t a[ARRAY_LENGTH] = {0x31,0x77,0x11,0x22,0x33,0x11,0x00,0x00,0x22,0x01};      //Defying our EC
+    uint8_t a[ARRAY_LENGTH] = {0x00,0x00,0x00,0x00,0x33,0x11,0x00,0x00,0x22,0x01};      //Defying our EC
+	uint8_t b[ARRAY_LENGTH] = {0x00,0x00,0x00,0x00,0x00,0x22,0x38,0x11,0xf3,0x21};      //Defying our EC
 
     printf("a = ");
-    printBinWhole(a, ARRAY_LENGTH);
+    printHexWhole(a, ARRAY_LENGTH);
     printf("b = ");
-    printBinWhole(b, ARRAY_LENGTH);
+    printHexWhole(b, ARRAY_LENGTH);
 
-    // a = shiftOneToLeft(a, ARRAY_LENGTH);
-    // printBinWhole(a);
-    // return 2;
-    
+
     printf("\n a*b: \n");
     mult(a, b, result);
-    printBinWhole(result, ARRAY_LENGTH);
+    printHexWhole(result, ARRAY_LENGTH);
     printf("\n");
+
+    printf("according to mathematica:\n");
+    printf("00caaa4991612593892d\n");
     
 
 	return 0;
