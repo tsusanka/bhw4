@@ -236,6 +236,11 @@ void lfsr(uint8_t* number)
 	// x&78 is shifted to x^0
 	// no need for destroying here because number[9] 7th bit is always 0 due to the shift
     number[9] = number[9] | x78;
+
+	// 1. bit ever needs to be destroyed, the shift could move 1 in here
+    number[0] = number[0] & ~pattern[0];
+    		
+    printf("lf %x", number[0]);
 }
 
 /**
@@ -256,8 +261,11 @@ void mult(uint8_t* a, uint8_t* b, uint8_t* result)
             }
             if ((i == ARRAY_LENGTH - 1) && (j == 7)) break;
             lfsr(result);
+
             tmp = tmp >> 1;
+    	printf(" xxx1 %x\n", result[0]);
         }
+    	printf(" xxx2 %x\n", result[0]);
         tmp = 128;
     }
 }
@@ -281,7 +289,7 @@ int main(int argc, uint8_t** argv)
     // loadInput(P_x, P_y, Q_x, Q_y);
 
     // uint8_t a[ARRAY_LENGTH] = {0x31,0x77,0x11,0x22,0x33,0x11,0x00,0x00,0x22,0x01};      //Defying our EC
-    uint8_t a[ARRAY_LENGTH] = {0x00,0x00,0x00,0x11,0x33,0x11,0x00,0x00,0x22,0x01};      //Defying our EC
+    uint8_t a[ARRAY_LENGTH] = {0xff,0x00,0x00,0x22,0x11,0x11,0x00,0x00,0x22,0x01};      //Defying our EC
 	uint8_t b[ARRAY_LENGTH] = {0x00,0x00,0x00,0x00,0x00,0x22,0x38,0x11,0xf3,0x21};      //Defying our EC
 
     printf("a = ");
@@ -291,10 +299,11 @@ int main(int argc, uint8_t** argv)
 
     printf("\n a*b: \n");
     mult(a, b, result);
-    printHexWhole(result, ARRAY_LENGTH);
-    printf("\n");
+    printf("%x\n", result[0]);
+    printBinWhole(result, ARRAY_LENGTH);
+    // printf("\n");
 
-    printf("according to mathematica:\n");
+    // printf("according to mathematica:\n");
     printf("39c46b789161259b8b2e\n");
     
 
