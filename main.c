@@ -236,6 +236,9 @@ void lfsr(uint8_t* number)
 	// x&78 is shifted to x^0
 	// no need for destroying here because number[9] 7th bit is always 0 due to the shift
     number[9] = number[9] | x78;
+
+	// 1. bit ever needs to be destroyed, the shift could move 1 in here
+    number[0] = number[0] & ~pattern[0];
 }
 
 /**
@@ -254,8 +257,13 @@ void mult(uint8_t* a, uint8_t* b, uint8_t* result)
             {
                 add(result, a, result);
             }
-            if ((i == ARRAY_LENGTH - 1) && (j == 7)) break;
+            if ((i == ARRAY_LENGTH - 1) && (j == 7))
+        	{
+        		result[0] = result[0] & ~pattern[0]; // destroys 1 bit. why? does that make any sense?
+        		break;
+        	}
             lfsr(result);
+
             tmp = tmp >> 1;
         }
         tmp = 128;
@@ -281,8 +289,8 @@ int main(int argc, uint8_t** argv)
     // loadInput(P_x, P_y, Q_x, Q_y);
 
     // uint8_t a[ARRAY_LENGTH] = {0x31,0x77,0x11,0x22,0x33,0x11,0x00,0x00,0x22,0x01};      //Defying our EC
-    uint8_t a[ARRAY_LENGTH] = {0x00,0x00,0x00,0x11,0x33,0x11,0x00,0x00,0x22,0x01};      //Defying our EC
-	uint8_t b[ARRAY_LENGTH] = {0x00,0x00,0x00,0x00,0x00,0x22,0x38,0x11,0xf3,0x21};      //Defying our EC
+    uint8_t a[ARRAY_LENGTH] = {0xff,0xee,0xee,0xff,0xee,0xff,0xee,0xff,0xee,0xff};      //Defying our EC
+	uint8_t b[ARRAY_LENGTH] = {0x11,0x22,0x33,0x44,0x55,0x11,0x22,0x33,0x44,0x55};      //Defying our EC
 
     printf("a = ");
     printHexWhole(a, ARRAY_LENGTH);
@@ -292,11 +300,6 @@ int main(int argc, uint8_t** argv)
     printf("\n a*b: \n");
     mult(a, b, result);
     printHexWhole(result, ARRAY_LENGTH);
-    printf("\n");
-
-    printf("according to mathematica:\n");
-    printf("39c46b789161259b8b2e\n");
-    
 
 	return 0;
 }
