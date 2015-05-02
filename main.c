@@ -228,15 +228,14 @@ void lfsr(uint8_t* number)
         {
             if ((0x80 & number[i]) > 0x00) number[i-1] += pattern[7];
         }
-        
         number[i] = number[i] << 1;
-        
-        if (i == 8) // number[0] & pattern[1] is x^78; number[i] & pattern[7] is x^8; & pattern[6] gets rid off the other bits
-        {
-            tmp = number[8] & ~pattern[6]; // destroys 6. bit
-            number[i] = tmp | x9;
-        }
     }
+    tmp = number[8] & ~pattern[6]; // destroys 6. bit
+	number[8] = tmp | x9;
+
+	// x&78 is shifted to x^0
+	// no need for destroying here because number[9] 7th bit is always 0 due to the shift
+    number[9] = number[9] | x78;
 }
 
 /**
@@ -269,9 +268,9 @@ void mult(uint8_t* a, uint8_t* b, uint8_t* result)
 int main(int argc, uint8_t** argv)
 {
     uint8_t P_x[ARRAY_LENGTH];
-    uint8_t P_y[ARRAY_LENGTH];      
-    uint8_t Q_x[ARRAY_LENGTH];      
-    uint8_t Q_y[ARRAY_LENGTH];      
+    uint8_t P_y[ARRAY_LENGTH];
+    uint8_t Q_x[ARRAY_LENGTH];
+    uint8_t Q_y[ARRAY_LENGTH];
     // uint8_t a[ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F};      //Defying our EC
 // 	uint8_t b[ARRAY_LENGTH] = {0x2C,0x75,0xA6,0x48,0x59,0x55,0x2F,0x97,0xC1,0x29};      //Defying our EC
 	uint8_t temp[ARRAY_LENGTH];
@@ -282,7 +281,7 @@ int main(int argc, uint8_t** argv)
     // loadInput(P_x, P_y, Q_x, Q_y);
 
     // uint8_t a[ARRAY_LENGTH] = {0x31,0x77,0x11,0x22,0x33,0x11,0x00,0x00,0x22,0x01};      //Defying our EC
-    uint8_t a[ARRAY_LENGTH] = {0x00,0x00,0x00,0x00,0x33,0x11,0x00,0x00,0x22,0x01};      //Defying our EC
+    uint8_t a[ARRAY_LENGTH] = {0x00,0x00,0x00,0x11,0x33,0x11,0x00,0x00,0x22,0x01};      //Defying our EC
 	uint8_t b[ARRAY_LENGTH] = {0x00,0x00,0x00,0x00,0x00,0x22,0x38,0x11,0xf3,0x21};      //Defying our EC
 
     printf("a = ");
@@ -290,14 +289,13 @@ int main(int argc, uint8_t** argv)
     printf("b = ");
     printHexWhole(b, ARRAY_LENGTH);
 
-
     printf("\n a*b: \n");
     mult(a, b, result);
     printHexWhole(result, ARRAY_LENGTH);
     printf("\n");
 
     printf("according to mathematica:\n");
-    printf("00caaa4991612593892d\n");
+    printf("39c46b789161259b8b2e\n");
     
 
 	return 0;
