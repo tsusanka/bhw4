@@ -331,7 +331,7 @@ void ellipticDoubling(uint8_t* t9, uint8_t* b, uint8_t* t1, uint8_t* t2, uint8_t
     R_y = t2;
     R_z = t3;
 
-    printf("ellipticDoubling:\n");
+    printf("elliptic doubling:\n");
     printHexWhole(R_x, ARRAY_LENGTH);
     printHexWhole(R_y, ARRAY_LENGTH);
     printHexWhole(R_z, ARRAY_LENGTH);
@@ -406,6 +406,7 @@ void ellipticAddition(uint8_t* t9, uint8_t* b, uint8_t* t1, uint8_t* t2, uint8_t
     R_x = t1;
     R_y = t2;
     R_z = t3;
+    printf("elliptic addition:\n");
     printHexWhole(R_x, ARRAY_LENGTH); // or fix with memcpy
     printHexWhole(R_y, ARRAY_LENGTH);
     printHexWhole(R_z, ARRAY_LENGTH);
@@ -444,23 +445,5 @@ int main(int argc, uint8_t** argv)
     Q_z[ARRAY_LENGTH - 1] = 0x01;
     
     // ellipticAddition(a, b, P_x, P_y, P_z, Q_x, Q_y, Q_z, R_x, R_y, R_z);
-
     ellipticDoubling(a, b, P_x, P_y, P_z, R_x, R_y, R_z);
-
-    return 0;
-
-    printf("P:\n");
-    printHexWhole(P_x, ARRAY_LENGTH);
-    printHexWhole(P_y, ARRAY_LENGTH);
-    printHexWhole(P_z, ARRAY_LENGTH);
-    printf("Q:\n");
-    printHexWhole(Q_x, ARRAY_LENGTH);
-    printHexWhole(Q_y, ARRAY_LENGTH);
-    printHexWhole(Q_z, ARRAY_LENGTH);
-    printf("P+Q:\n");
-    printHexWhole(R_x, ARRAY_LENGTH);
-    printHexWhole(R_y, ARRAY_LENGTH);
-    printHexWhole(R_z, ARRAY_LENGTH);
-
-	return 0;
 }
