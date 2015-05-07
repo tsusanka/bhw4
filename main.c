@@ -293,15 +293,48 @@ int isEqualTo(uint8_t needle, uint8_t * haystack)
 void ellipticDoubling(uint8_t* t9, uint8_t* b, uint8_t* t1, uint8_t* t2, uint8_t* t3, uint8_t* R_x, uint8_t* R_y, uint8_t* R_z)
 {
     int i = 0;
-    uint8_t c[ARRAY_LENGTH];
-    zeroArray(c, ARRAY_LENGTH);
+    uint8_t t4[ARRAY_LENGTH]; // t4 = c
+    zeroArray(t4, ARRAY_LENGTH);
 
-    memcpy(c, b, ARRAY_LENGTH);
-    for (i = 0; i < 2; i++)
+    memcpy(t4, b, ARRAY_LENGTH);
+    for (i = 0; i < 79 - 2; i++)
     {
-        mult(c, c, c);
+        mult(t4, t4, t4);
     }
-    printHexWhole(c, ARRAY_LENGTH);
+
+    if (isEqualTo(0, t1) || isEqualTo(0, t3)) { // step 5
+        // (1, 1, 0)
+        R_x[ARRAY_LENGTH - 1] = 0x01;
+        R_y[ARRAY_LENGTH - 1] = 0x01;
+        return;
+    }
+
+    mult(t2, t3, t2);
+    mult(t3, t3, t3);
+    mult(t3, t4, t4);
+    mult(t1, t3, t3); // step 9
+
+    add(t2, t3, t2);
+    add(t1, t4, t4);
+    mult(t4, t4, t4);
+    mult(t4, t4, t4); // step 13
+
+    mult(t1, t1, t1);
+    add(t1, t2, t2);
+    mult(t2, t4, t2);
+    mult(t1, t1, t1); // step 17
+
+    mult(t1, t3, t1);
+    add(t1, t2, t2);
+    t1 = t4;
+    R_x = t1;
+    R_y = t2;
+    R_z = t3;
+
+    printf("ellipticDoubling:\n");
+    printHexWhole(R_x, ARRAY_LENGTH);
+    printHexWhole(R_y, ARRAY_LENGTH);
+    printHexWhole(R_z, ARRAY_LENGTH);
 }
 
 // ellipticAddition(a, b, P_x, P_y, P_z, Q_x, Q_y, Q_z, R_x, R_y, R_z);
