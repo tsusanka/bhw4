@@ -244,8 +244,11 @@ void lfsr(uint8_t* number)
 /**
  * Multiplies a * b and stores it in result.
  **/
-void mult(uint8_t* a, uint8_t* b, uint8_t* result)
+void mult(uint8_t* a, uint8_t* b, uint8_t* finalResult)
 {
+    uint8_t result[ARRAY_LENGTH];
+    zeroArray(result, ARRAY_LENGTH);
+
     uint8_t tmp = 128; // 2^7
     int i, j  = 0;
 
@@ -268,6 +271,7 @@ void mult(uint8_t* a, uint8_t* b, uint8_t* result)
         }
         tmp = 128;
     }
+    memcpy(finalResult, result, ARRAY_LENGTH);
 }
 
 int isEqualTo(uint8_t needle, uint8_t * haystack)
@@ -391,11 +395,9 @@ int main(int argc, uint8_t** argv)
     Q_z[ARRAY_LENGTH - 1] = 0x01;
     
     ellipticAddition(a, b, P_x, P_y, P_z, Q_x, Q_y, Q_z, R_x, R_y, R_z);
-    
-    printHexWhole(R_x, ARRAY_LENGTH);
-    
+
     return 0;
-    
+
     printf("P:\n");
     printHexWhole(P_x, ARRAY_LENGTH);
     printHexWhole(P_y, ARRAY_LENGTH);
