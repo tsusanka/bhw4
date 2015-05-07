@@ -289,6 +289,21 @@ int isEqualTo(uint8_t needle, uint8_t * haystack)
     return 0;
 }
 
+// a, b, P_x, P_y, P_z, R_x, R_y, R_z
+void ellipticDoubling(uint8_t* t9, uint8_t* b, uint8_t* t1, uint8_t* t2, uint8_t* t3, uint8_t* R_x, uint8_t* R_y, uint8_t* R_z)
+{
+    int i = 0;
+    uint8_t c[ARRAY_LENGTH];
+    zeroArray(c, ARRAY_LENGTH);
+
+    memcpy(c, b, ARRAY_LENGTH);
+    for (i = 0; i < 2; i++)
+    {
+        mult(c, c, c);
+    }
+    printHexWhole(c, ARRAY_LENGTH);
+}
+
 // ellipticAddition(a, b, P_x, P_y, P_z, Q_x, Q_y, Q_z, R_x, R_y, R_z);
 void ellipticAddition(uint8_t* t9, uint8_t* b, uint8_t* t1, uint8_t* t2, uint8_t* t3, uint8_t* t4, uint8_t* t5, uint8_t* t6, uint8_t* R_x, uint8_t* R_y, uint8_t* R_z)
 {
@@ -358,7 +373,7 @@ void ellipticAddition(uint8_t* t9, uint8_t* b, uint8_t* t1, uint8_t* t2, uint8_t
     R_x = t1;
     R_y = t2;
     R_z = t3;
-    printHexWhole(R_x, ARRAY_LENGTH);
+    printHexWhole(R_x, ARRAY_LENGTH); // or fix with memcpy
     printHexWhole(R_y, ARRAY_LENGTH);
     printHexWhole(R_z, ARRAY_LENGTH);
 }
@@ -378,8 +393,9 @@ int main(int argc, uint8_t** argv)
     uint8_t R_y[ARRAY_LENGTH];
     uint8_t R_z[ARRAY_LENGTH];
     uint8_t a[ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F};      //Defying our EC
-    uint8_t b[ARRAY_LENGTH] = {0x2C,0x75,0xA6,0x48,0x59,0x55,0x2F,0x97,0xC1,0x29};      //Defying our EC
-	
+    uint8_t b[ARRAY_LENGTH] = {0x2C,0x0B,0xB3,0x1C,0x6B,0xEC,0xC0,0x3D,0x68,0xA7};      //Defying our EC
+
+
 	zeroArray(P_x,ARRAY_LENGTH);
 	zeroArray(P_y,ARRAY_LENGTH);
 	zeroArray(P_z,ARRAY_LENGTH);
@@ -394,7 +410,9 @@ int main(int argc, uint8_t** argv)
     P_z[ARRAY_LENGTH - 1] = 0x01;
     Q_z[ARRAY_LENGTH - 1] = 0x01;
     
-    ellipticAddition(a, b, P_x, P_y, P_z, Q_x, Q_y, Q_z, R_x, R_y, R_z);
+    // ellipticAddition(a, b, P_x, P_y, P_z, Q_x, Q_y, Q_z, R_x, R_y, R_z);
+
+    ellipticDoubling(a, b, P_x, P_y, P_z, R_x, R_y, R_z);
 
     return 0;
 
