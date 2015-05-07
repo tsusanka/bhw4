@@ -285,45 +285,20 @@ int isEqualTo(uint8_t needle, uint8_t * haystack)
     return 0;
 }
 
+// ellipticAddition(a, b, P_x, P_y, P_z, Q_x, Q_y, Q_z, R_x, R_y, R_z);
 void ellipticAddition(uint8_t* t9, uint8_t* b, uint8_t* t1, uint8_t* t2, uint8_t* t3, uint8_t* t4, uint8_t* t5, uint8_t* t6, uint8_t* R_x, uint8_t* R_y, uint8_t* R_z)
 {
-    //uint8_t t1[ARRAY_LENGTH];
-    //uint8_t t2[ARRAY_LENGTH];
-    //uint8_t t3[ARRAY_LENGTH];
-    //uint8_t t4[ARRAY_LENGTH];
-    //uint8_t t5[ARRAY_LENGTH];
-    //uint8_t t6[ARRAY_LENGTH];
     uint8_t t7[ARRAY_LENGTH];
     uint8_t t8[ARRAY_LENGTH];
-    //uint8_t t9[ARRAY_LENGTH];
-    //zeroArray(t1,ARRAY_LENGTH);
-    //zeroArray(t2,ARRAY_LENGTH);
-    //zeroArray(t3,ARRAY_LENGTH);
-    //zeroArray(t4,ARRAY_LENGTH);
-    //zeroArray(t5,ARRAY_LENGTH);
-    //zeroArray(t6,ARRAY_LENGTH);
     zeroArray(t7,ARRAY_LENGTH);
     zeroArray(t8,ARRAY_LENGTH);
-    //zeroArray(t9,ARRAY_LENGTH);
-    
+
     int flag = 1;
     
     if (!isEqualTo(1,t6)) flag = 2;
     
-   /* t1 = P_x; // copy?
-    t2 = P_y;
-    t3 = P_z;
-    t4 = Q_x;
-    t5 = Q_y; */ // step 5
-    
-    //if (!isEqualTo(0, a))           //Remember 
-    //{
-    //    t9 = a;
-    //}
-
     if (flag == 2)
     {
-        //t6 = Q_z;
         mult(t6, t6, t7); // todo: replace with square?
         mult(t1, t7, t1);
         mult(t6, t7, t7);
@@ -338,19 +313,16 @@ void ellipticAddition(uint8_t* t9, uint8_t* b, uint8_t* t1, uint8_t* t2, uint8_t
     
     if (isEqualTo(0, t1))
     {
-        if (isEqualTo(0, t2))
-        {
+        if (isEqualTo(0, t2)) {
             // (0, 0, 0)
             return;
-        }
-        else
-        {
+
+        } else {
             // (1, 1, 0)
             R_x[ARRAY_LENGTH - 1] = 0x01;
             R_y[ARRAY_LENGTH - 1] = 0x01;
             return;
         }
-        
     }
 
     mult(t2, t4, t4); // step 15
@@ -370,19 +342,21 @@ void ellipticAddition(uint8_t* t9, uint8_t* b, uint8_t* t1, uint8_t* t2, uint8_t
     mult(t1, t1, t5);
     mult(t1, t5, t1); // step 25
     
-   // if (!isEqualTo(0, a))             //a mame ine ako 0
-    //{
-        mult(t3, t3, t8);
-        mult(t8, t9, t9);
-        add(t1, t9, t1);
-    //}
-    
+    // todo if a!=0 ??
+    mult(t3, t3, t8);
+    mult(t8, t9, t9);
+    add(t1, t9, t1);
+
     add(t1, t2, t1); // step 27
     mult(t1, t4, t4);
     add(t4, t7, t2);
+    
     R_x = t1;
     R_y = t2;
     R_z = t3;
+    printHexWhole(R_x, ARRAY_LENGTH);
+    printHexWhole(R_y, ARRAY_LENGTH);
+    printHexWhole(R_z, ARRAY_LENGTH);
 }
 
 /*****************************************************************************************************************************/
@@ -393,28 +367,47 @@ int main(int argc, uint8_t** argv)
     uint8_t P_x[ARRAY_LENGTH];
     uint8_t P_y[ARRAY_LENGTH];
     uint8_t P_z[ARRAY_LENGTH];
-    uint8_t Q_x[ARRAY_LENGTH];      
+    uint8_t Q_x[ARRAY_LENGTH];
     uint8_t Q_y[ARRAY_LENGTH];
     uint8_t Q_z[ARRAY_LENGTH];
-    uint8_t R_x[ARRAY_LENGTH];      
+    uint8_t R_x[ARRAY_LENGTH];
     uint8_t R_y[ARRAY_LENGTH];
-    uint8_t R_z[ARRAY_LENGTH];  
+    uint8_t R_z[ARRAY_LENGTH];
     uint8_t a[ARRAY_LENGTH] = {0x4A,0x2E,0x38,0xA8,0xF6,0x6D,0x7F,0x4C,0x38,0x5F};      //Defying our EC
     uint8_t b[ARRAY_LENGTH] = {0x2C,0x75,0xA6,0x48,0x59,0x55,0x2F,0x97,0xC1,0x29};      //Defying our EC
-	uint8_t temp[ARRAY_LENGTH];
 	
+	zeroArray(P_x,ARRAY_LENGTH);
+	zeroArray(P_y,ARRAY_LENGTH);
+	zeroArray(P_z,ARRAY_LENGTH);
+	zeroArray(Q_x,ARRAY_LENGTH);
+	zeroArray(Q_y,ARRAY_LENGTH);
+	zeroArray(Q_z,ARRAY_LENGTH);
 	zeroArray(R_x,ARRAY_LENGTH);
 	zeroArray(R_y,ARRAY_LENGTH);
 	zeroArray(R_z,ARRAY_LENGTH);
 
-    uint8_t result[ARRAY_LENGTH];
-    zeroArray(result, ARRAY_LENGTH);
-
+    loadInput(P_x, P_y, Q_x, Q_y);
     P_z[ARRAY_LENGTH - 1] = 0x01;
     Q_z[ARRAY_LENGTH - 1] = 0x01;
-    loadInput(P_x, P_y, Q_x, Q_y);
     
     ellipticAddition(a, b, P_x, P_y, P_z, Q_x, Q_y, Q_z, R_x, R_y, R_z);
+    
+    printHexWhole(R_x, ARRAY_LENGTH);
+    
+    return 0;
+    
+    printf("P:\n");
+    printHexWhole(P_x, ARRAY_LENGTH);
+    printHexWhole(P_y, ARRAY_LENGTH);
+    printHexWhole(P_z, ARRAY_LENGTH);
+    printf("Q:\n");
+    printHexWhole(Q_x, ARRAY_LENGTH);
+    printHexWhole(Q_y, ARRAY_LENGTH);
+    printHexWhole(Q_z, ARRAY_LENGTH);
+    printf("P+Q:\n");
+    printHexWhole(R_x, ARRAY_LENGTH);
+    printHexWhole(R_y, ARRAY_LENGTH);
+    printHexWhole(R_z, ARRAY_LENGTH);
 
 	return 0;
 }
