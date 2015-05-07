@@ -24,6 +24,9 @@
 
 #define ONE_NOT_FOUND 9
 
+#define INFINITY 0
+
+
 uint8_t pattern[8] = {0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01};
 
 
@@ -340,6 +343,22 @@ void ellipticDoubling(uint8_t* t9, uint8_t* b, uint8_t* t1, uint8_t* t2, uint8_t
 // ellipticAddition(a, b, P_x, P_y, P_z, Q_x, Q_y, Q_z, R_x, R_y, R_z);
 void ellipticAddition(uint8_t* t9, uint8_t* b, uint8_t* t1, uint8_t* t2, uint8_t* t3, uint8_t* t4, uint8_t* t5, uint8_t* t6, uint8_t* R_x, uint8_t* R_y, uint8_t* R_z)
 {
+
+    if (t1 == INFINITY && t2 == INFINITY) {
+        printf("elliptic addition:\n");
+        printHexWhole(t4, ARRAY_LENGTH); // fix with memcpy
+        printHexWhole(t5, ARRAY_LENGTH);
+        printHexWhole(t6, ARRAY_LENGTH);
+        return;
+    }
+    if (t4 == INFINITY && t5 == INFINITY) {
+        printf("elliptic addition:\n");
+        printHexWhole(t1, ARRAY_LENGTH); // fix with memcpy
+        printHexWhole(t2, ARRAY_LENGTH);
+        printHexWhole(t3, ARRAY_LENGTH);
+        return;
+    }
+
     uint8_t t7[ARRAY_LENGTH];
     uint8_t t8[ARRAY_LENGTH];
     zeroArray(t7,ARRAY_LENGTH);
@@ -444,6 +463,9 @@ int main(int argc, uint8_t** argv)
     P_z[ARRAY_LENGTH - 1] = 0x01;
     Q_z[ARRAY_LENGTH - 1] = 0x01;
     
-    // ellipticAddition(a, b, P_x, P_y, P_z, Q_x, Q_y, Q_z, R_x, R_y, R_z);
-    ellipticDoubling(a, b, P_x, P_y, P_z, R_x, R_y, R_z);
+    P_x = INFINITY;
+    P_y = INFINITY;
+
+    ellipticAddition(a, b, P_x, P_y, P_z, Q_x, Q_y, Q_z, R_x, R_y, R_z);
+    // ellipticDoubling(a, b, P_x, P_y, P_z, R_x, R_y, R_z);
 }
